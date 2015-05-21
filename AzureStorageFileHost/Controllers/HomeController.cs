@@ -1,16 +1,12 @@
-﻿using System.IO;
-using System.Net;
-using System.Web;
-using System.Web.Http;
+﻿using System.Web.Mvc;
 
 namespace AzureStorageFileHost.Controllers
 {
-    public class HomeController : ApiController
+    public class HomeController : Controller
     {
-        [HttpGet, Route("")]
-        public string Upload()
+        public string Index()
         {
-            HttpContext.Current.Response.StatusCode = 202;
+            ControllerContext.HttpContext.Response.StatusCode = 202;
             return "ACCEPTED";
         }
     }
