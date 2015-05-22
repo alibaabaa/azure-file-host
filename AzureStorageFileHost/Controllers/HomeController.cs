@@ -39,28 +39,13 @@ namespace AzureStorageFileHost.Controllers
                 ControllerContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 return Json(new { messsage = "content set not found" });
             }
-            var probablyAnImage = ProbablyResizableImage(file.InputStream, file.ContentType);
+
+            var processor = new ActionSetStreamProcessor(file.InputStream, file.ContentType, json);
+            await processor.ProcessStreamForPublicBlobUrl(config).ConfigureAwait(false);
 
             ControllerContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.Accepted;
             return Json(new { status = "ACCEPTED" });
         }
 
-        private static bool ProbablyResizableImage(Stream stream, string contentType)
-        {
-            stream.Position = 0;
-            using (var reader = new BinaryReader(stream))
-            {
-                switch (contentType)
-                {
-                    case "image/png":
-                        return
-                            reader.ReadUInt64() == 0xa1a0a0d474e5089;
-                    case "image/jpeg":
-                        return reader.ReadUInt32() == 0xdbffd8ff;
-                    default:
-                        return false;
-                }
-            }
-        }
     }
 }
