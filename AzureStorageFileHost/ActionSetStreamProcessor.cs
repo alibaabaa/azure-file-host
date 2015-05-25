@@ -12,32 +12,73 @@ namespace AzureStorageFileHost
     public class ActionSetStreamProcessor
     {
         private readonly Stream inputStream = new MemoryStream();
+        private readonly string filename;
         private readonly string contentType;
         private readonly JObject processConfig;
 
-        public ActionSetStreamProcessor(Stream inputStream, string contentType, JObject processConfig)
+        public ActionSetStreamProcessor(
+            Stream inputStream,
+            string filename,
+            string contentType,
+            JObject processConfig)
         {
             inputStream.Position = 0;
             inputStream.CopyTo(this.inputStream);
             this.inputStream.Position = 0;
+            this.filename = filename;
             this.contentType = contentType;
             this.processConfig = processConfig;
         }
 
         public async Task<IEnumerable<string>> ProcessStreamForPublicBlobUrl(string actionSetName)
         {
-            if (processConfig["contentActionSets"].First(set => (string)set["name"] == actionSetName)["imageActions"] != null &&
+            var blobContainer = await BlobAccess.GetBlobContainer(
+                (string)processConfig["storage"]["accountName"],
+                (string)processConfig["storage"]["accessKey"],
+                (string)processConfig["storage"]["container"]).ConfigureAwait(false);
+
+            var actionSets = processConfig["contentActionSets"].First(set => (string)set["name"] == actionSetName);
+            if (actionSets["imageActions"] != null &&
                 StreamAnalyser.ProbablyResizableImage(inputStream, contentType))
             {
+                var imageConfig = actionSets["imageActions"];
                 //do some image processing
                 int i = 1;
             }
             else
             {
-                int j = 2;
-                //process as file
+                var fileConfig = (JArray)actionSets["fileActions"];
+                foreach (var config in fileConfig)
+                {
+                    var newFilename = config["rename"] == null
+                        ? filename
+                        : ApplyRenamePattern(filename, (string)config["rename"]);
+                    if (config["replaceExisting"] != null && !(bool)config["replaceExisting"])
+                    {
+                        var fileIncrement = 1;
+                        var finalFilename = newFilename;
+                        while (await BlobAccess.BlobExistsInContainer(blobContainer, newFilename).ConfigureAwait(false))
+                        {
+                            finalFilename =
+                                newFilename.Substring(0, newFilename.LastIndexOf('.')) +
+                                fileIncrement++ +
+                                newFilename.Substring(newFilename.LastIndexOf('.'));
+                        }
+                        newFilename = finalFilename;
+                    }
+                    await BlobAccess.StreamToContainer(blobContainer, inputStream, newFilename).ConfigureAwait(false);
+                }
             }
             return await Task.FromResult(Enumerable.Empty<string>());
+        }
+
+        private static string ApplyRenamePattern(string filename, string renamePattern)
+        {
+            filename = filename.Replace("{now:MM}", DateTime.Now.ToString("MM"));
+            filename = filename.Replace("{now:dd}", DateTime.Now.ToString("dd"));
+            filename = filename.Replace("{file:name}", filename.Substring(0, filename.LastIndexOf('.')));
+            filename = filename.Replace("{file:ext}", filename.Substring(filename.LastIndexOf('.') + 1));
+            return filename;
         }
     }
 }

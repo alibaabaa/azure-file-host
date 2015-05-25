@@ -120,7 +120,7 @@
     <Compile Include="ActionSetStreamProcessor.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="BlobUpload.cs" />
+    <Compile Include="BlobAccess.cs" />
     <Compile Include="ConfigurationStorage\ConfigurationEntity.cs" />
     <Compile Include="ConfigurationStorage\IUploadConfigurationStore.cs" />
     <Compile Include="ConfigurationStorage\UploadConfigurationStore.cs" />

@@ -40,7 +40,7 @@ namespace AzureStorageFileHost.Controllers
                 return Json(new { messsage = "content set not found" });
             }
 
-            var processor = new ActionSetStreamProcessor(file.InputStream, file.ContentType, json);
+            var processor = new ActionSetStreamProcessor(file.InputStream, file.FileName, file.ContentType, json);
             await processor.ProcessStreamForPublicBlobUrl(config).ConfigureAwait(false);
 
             ControllerContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.Accepted;

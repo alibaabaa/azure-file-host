@@ -5,7 +5,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace AzureStorageFileHost
 {
-    public static class BlobUpload
+    public static class BlobAccess
     {
         public async static Task<CloudBlobContainer> GetBlobContainer(
             string storageAccountName,
@@ -28,6 +28,11 @@ namespace AzureStorageFileHost
             var blob = container.GetBlockBlobReference(name);
             inputStream.Position = 0;
             await blob.UploadFromStreamAsync(inputStream).ConfigureAwait(false);
+        }
+
+        public static async Task<bool> BlobExistsInContainer(CloudBlobContainer container, string name)
+        {
+            return await container.GetBlockBlobReference(name).ExistsAsync().ConfigureAwait(false);
         }
     }
 }
