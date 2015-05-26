@@ -1,0 +1,57 @@
+﻿{
+   "storage":{
+      "accountName":"jester",
+      "accessKey":"AcCeSsKeY",
+      "container":"uploads"
+   },
+   "apiKey":"2aef20b3-6c1a-43ca-8726-4ba116880c29",
+   "publicUrl":"http://public-cdn.url/location/",
+   "contentActionSets":[
+      {
+         "name":"blog",
+         "imageActions":[
+            {
+               "name":"original",
+               "rename":"{now:MM}/{now:dd}/{file:name}.{file:ext}",
+               "replaceExisting":false
+            },
+            {
+               "name":"300 wide",
+               "resize":{
+                  "constraint":"width",
+                  "size":300,
+                  "upscale":false
+               },
+               "rename":"{now:MM}/{now:dd}/{file:name}-{file:w}x{file:h}.{file:ext}",
+               "replaceExisting":false
+            },
+            {
+               "name":"795 wide",
+               "resize":{
+                  "constraint":"width",
+                  "size":795,
+                  "upscale":false
+               },
+               "rename":"{now:MM}/{now:dd}/{file:name}-{file:w}x{file:h}.{file:ext}",
+               "replaceExisting":false
+            }
+         ],
+         "fileActions":[
+            {
+               "name":"original",
+               "rename":"{now:MM}/{now:dd}/{file:name}.{file:ext}",
+               "replaceExisting":false
+            }
+         ]
+      },
+      {
+         "name":"standard",
+         "fileActions":[
+            {
+               "name":"original",
+               "replaceExisting":false
+            }
+         ]
+      }
+   ]
+}
