@@ -23,9 +23,10 @@ namespace AzureStorageFileHost
             return container;
         }
 
-        public static async Task StreamToContainer(CloudBlobContainer container, Stream inputStream, string name)
+        public static async Task StreamToContainer(CloudBlobContainer container, Stream inputStream, string name, string contentType)
         {
             var blob = container.GetBlockBlobReference(name);
+            blob.Properties.ContentType = contentType;
             inputStream.Position = 0;
             await blob.UploadFromStreamAsync(inputStream).ConfigureAwait(false);
         }

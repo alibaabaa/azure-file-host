@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
@@ -57,16 +58,16 @@ namespace AzureStorageFileHost
                     {
                         var fileIncrement = 1;
                         var finalFilename = newFilename;
-                        while (await BlobAccess.BlobExistsInContainer(blobContainer, newFilename).ConfigureAwait(false))
+                        while (await BlobAccess.BlobExistsInContainer(blobContainer, finalFilename).ConfigureAwait(false))
                         {
                             finalFilename =
                                 newFilename.Substring(0, newFilename.LastIndexOf('.')) +
-                                fileIncrement++ +
+                                "_" + fileIncrement++ +
                                 newFilename.Substring(newFilename.LastIndexOf('.'));
                         }
                         newFilename = finalFilename;
                     }
-                    await BlobAccess.StreamToContainer(blobContainer, inputStream, newFilename).ConfigureAwait(false);
+                    await BlobAccess.StreamToContainer(blobContainer, inputStream, newFilename, contentType).ConfigureAwait(false);
                 }
             }
             return await Task.FromResult(Enumerable.Empty<string>());
@@ -74,11 +75,11 @@ namespace AzureStorageFileHost
 
         private static string ApplyRenamePattern(string filename, string renamePattern)
         {
-            filename = filename.Replace("{now:MM}", DateTime.Now.ToString("MM"));
-            filename = filename.Replace("{now:dd}", DateTime.Now.ToString("dd"));
-            filename = filename.Replace("{file:name}", filename.Substring(0, filename.LastIndexOf('.')));
-            filename = filename.Replace("{file:ext}", filename.Substring(filename.LastIndexOf('.') + 1));
-            return filename;
+            renamePattern = renamePattern.Replace("{now:MM}", DateTime.Now.ToString("MM"));
+            renamePattern = renamePattern.Replace("{now:dd}", DateTime.Now.ToString("dd"));
+            renamePattern = renamePattern.Replace("{file:name}", filename.Substring(0, filename.LastIndexOf('.')));
+            renamePattern = renamePattern.Replace("{file:ext}", filename.Substring(filename.LastIndexOf('.') + 1));
+            return renamePattern;
         }
     }
 }

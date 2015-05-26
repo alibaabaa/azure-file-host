@@ -46,6 +46,5 @@ namespace AzureStorageFileHost.Controllers
             ControllerContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.Accepted;
             return Json(new { status = "ACCEPTED" });
         }
-
     }
 }
