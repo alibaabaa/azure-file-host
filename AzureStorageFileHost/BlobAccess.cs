@@ -19,7 +19,14 @@ namespace AzureStorageFileHost
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             var containerClient = storageAccount.CreateCloudBlobClient();
             var container = containerClient.GetContainerReference(containerName);
-            await container.CreateIfNotExistsAsync().ConfigureAwait(false);
+            if (await container.CreateIfNotExistsAsync().ConfigureAwait(false))
+            {
+                await container.SetPermissionsAsync(
+                    new BlobContainerPermissions
+                    {
+                        PublicAccess = BlobContainerPublicAccessType.Blob
+                    }).ConfigureAwait(false);
+            }
             return container;
         }
 

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json.Linq;
 
 namespace AzureStorageFileHost
@@ -42,35 +43,52 @@ namespace AzureStorageFileHost
             if (actionSets["imageActions"] != null &&
                 StreamAnalyser.ProbablyResizableImage(inputStream, contentType))
             {
-                var imageConfig = actionSets["imageActions"];
-                //do some image processing
-                int i = 1;
+                var imageConfig = (JArray)actionSets["imageActions"];
+                foreach (var config in imageConfig)
+                {
+                    await StreamImageConfigResultToContainer(config, blobContainer).ConfigureAwait(false);
+                }
             }
             else
             {
                 var fileConfig = (JArray)actionSets["fileActions"];
                 foreach (var config in fileConfig)
                 {
-                    var newFilename = config["rename"] == null
-                        ? filename
-                        : ApplyRenamePattern(filename, (string)config["rename"]);
-                    if (config["replaceExisting"] != null && !(bool)config["replaceExisting"])
-                    {
-                        var fileIncrement = 1;
-                        var finalFilename = newFilename;
-                        while (await BlobAccess.BlobExistsInContainer(blobContainer, finalFilename).ConfigureAwait(false))
-                        {
-                            finalFilename =
-                                newFilename.Substring(0, newFilename.LastIndexOf('.')) +
-                                "_" + fileIncrement++ +
-                                newFilename.Substring(newFilename.LastIndexOf('.'));
-                        }
-                        newFilename = finalFilename;
-                    }
-                    await BlobAccess.StreamToContainer(blobContainer, inputStream, newFilename, contentType).ConfigureAwait(false);
+                    await StreamFileConfigResultToContainer(config, blobContainer).ConfigureAwait(false);
                 }
             }
             return await Task.FromResult(Enumerable.Empty<string>());
+        }
+
+        private async Task StreamImageConfigResultToContainer(JToken config, CloudBlobContainer blobContainer)
+        {
+
+        }
+
+        private async Task StreamFileConfigResultToContainer(JToken config, CloudBlobContainer blobContainer)
+        {
+            var newFilename = config["rename"] == null
+                ? filename
+                : ApplyRenamePattern(filename, (string)config["rename"]);
+            if (config["replaceExisting"] != null && !(bool)config["replaceExisting"])
+            {
+                newFilename = await NextAvailableFilename(blobContainer, newFilename).ConfigureAwait(false);
+            }
+            await BlobAccess.StreamToContainer(blobContainer, inputStream, newFilename, contentType).ConfigureAwait(false);
+        }
+
+        private static async Task<string> NextAvailableFilename(CloudBlobContainer blobContainer, string filename)
+        {
+            var fileIncrement = 1;
+            var finalFilename = filename;
+            while (await BlobAccess.BlobExistsInContainer(blobContainer, finalFilename).ConfigureAwait(false))
+            {
+                finalFilename =
+                    filename.Substring(0, filename.LastIndexOf('.')) +
+                    "_" + fileIncrement++ +
+                    filename.Substring(filename.LastIndexOf('.'));
+            }
+            return finalFilename;
         }
 
         private static string ApplyRenamePattern(string filename, string renamePattern)
