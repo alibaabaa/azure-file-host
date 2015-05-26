@@ -40,11 +40,16 @@ namespace AzureStorageFileHost.Controllers
                 return Json(new { messsage = "content set not found" });
             }
 
-            var processor = new ActionSetStreamProcessor(file.InputStream, file.FileName, file.ContentType, json);
-            await processor.ProcessStreamForPublicBlobUrl(config).ConfigureAwait(false);
-
-            ControllerContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.Accepted;
-            return Json(new { status = "ACCEPTED" });
+            using (file.InputStream)
+            {
+                var processor = new ActionSetStreamProcessor(
+                    file.InputStream,
+                    file.FileName.ToLowerInvariant(),
+                    file.ContentType,
+                    json);
+                var uploaded = await processor.ProcessStreamForPublicBlobUrl(config).ConfigureAwait(false);
+                return Json(uploaded);
+            }
         }
     }
 }
