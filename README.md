@@ -34,7 +34,7 @@ Each JSON configuration should be added as a row to an Azure table called `uploa
 ## JSON configuration options
 Refer to [example-config.json](https://github.com/alibaabaa/azure-file-host/blob/master/example-config.json) for a sample JSON configuration and the available options. `imageactions` are used when processing jpeg and png file types. All other files are processed using `fileactions`. A `contentActionSet` is chosen by matching to the POSTed request parameter `config`.
 
-## Making a request
+## Uploading a file
 azure-file-host accepts multipart/form-data HTTP POST requests to `/`. Perhaps the easiest way to form a request is with a standard HTML form:
 
 ```html
