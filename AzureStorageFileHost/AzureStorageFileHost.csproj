@@ -125,9 +125,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="BlobAccess.cs" />
     <Compile Include="ConfigurationStorage\ConfigurationEntity.cs" />
-    <Compile Include="ConfigurationStorage\IUploadConfigurationStore.cs" />
     <Compile Include="ConfigurationStorage\UploadConfigurationStore.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -149,6 +148,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Upload\Receive.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

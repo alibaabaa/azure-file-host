@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
@@ -7,9 +8,9 @@ using Newtonsoft.Json.Linq;
 
 namespace AzureStorageFileHost.ConfigurationStorage
 {
-    public class UploadConfigurationStore : IUploadConfigurationStore
+    public class UploadConfigurationStore
     {
-        private const string TableName = "uploadconfigs";
+        private const string TableName = "uploadconfig";
         public async Task<JObject> GetConfiguration(Guid apiKey)
         {
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("ConfigurationStore"));
@@ -24,6 +25,25 @@ namespace AzureStorageFileHost.ConfigurationStorage
                 throw new ArgumentOutOfRangeException("apiKey", "Provided API value does not match an upload configuration");
             }
             return JObject.Parse(((ConfigurationEntity)retrieveConfigResult.Result).Config);
+        }
+
+        public async Task<bool> AtLeastOneConfigExists()
+        {
+            try
+            {
+                var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("ConfigurationStore"));
+                var tableClient = storageAccount.CreateCloudTableClient();
+                var table = tableClient.GetTableReference(TableName);
+                await table.CreateIfNotExistsAsync().ConfigureAwait(false);
+                var configQuery = new TableQuery<ConfigurationEntity>().Where(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "JsonConfig"));
+                var resultSet = table.ExecuteQuery(configQuery);
+                return resultSet.Any();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

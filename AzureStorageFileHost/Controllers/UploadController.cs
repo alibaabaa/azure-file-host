@@ -7,13 +7,26 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using AzureStorageFileHost.ConfigurationStorage;
+using Microsoft.Azure;
 using Newtonsoft.Json.Linq;
 
 namespace AzureStorageFileHost.Controllers
 {
     public class UploadController : Controller
     {
-        private readonly IUploadConfigurationStore store = new UploadConfigurationStore();
+        private readonly UploadConfigurationStore store = new UploadConfigurationStore();
+
+        [HttpGet]
+        public async Task<ActionResult> Receive()
+        {
+            var noGetResponseSetting = CloudConfigurationManager.GetSetting("NoGetResponse");
+            if (noGetResponseSetting != null && Convert.ToBoolean(noGetResponseSetting))
+            {
+                return HttpNotFound();
+            }
+            ViewBag.ConfigExists = await store.AtLeastOneConfigExists().ConfigureAwait(false);
+            return View();
+        }
 
         [HttpPost]
         public async Task<JsonResult> Receive(HttpPostedFileBase file, Guid apiKey, string config)

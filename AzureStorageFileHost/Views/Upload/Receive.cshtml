@@ -1,0 +1,38 @@
+﻿@inherits System.Web.Mvc.WebViewPage
+@{
+    Layout = null;
+}<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>azure-file-host is running</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>azure-file-host is <span class="text-success bg-success">running</span></h1>
+            <p class="lead">azure-file-host is now running on this URL. For further information, visit the project's <a href="https://github.com/alibaabaa/azure-file-host">GitHub page</a>.</p>
+        </div>
+        <div class="row marketing">
+            <div class="col-lg-6">
+                <h4>To disable this page</h4>
+                <p>To prevent azure-file-host from responding to GET requests, set app setting <code>key="NoGetResponse" value="true"</code>.</p>
+            </div>
+            <div class="col-lg-6">
+                @if (ViewBag.ConfigExists)
+                {
+                    <h4 class="text-success">Configuration found</h4>
+                    <p>At least one JSON configuration was found in the store.</p>
+                }
+                else
+                {
+                    <h4 class="text-danger">Configuration not found</h4>
+                    <p>The service is running, but no JSON configuration could be found.</p>
+                }
+            </div>
+        </div>
+    </div> 
+</body>
+</html>
