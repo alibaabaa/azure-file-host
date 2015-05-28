@@ -10,7 +10,7 @@ namespace AzureStorageFileHost.ConfigurationStorage
 {
     public class UploadConfigurationStore
     {
-        private const string TableName = "uploadconfig";
+        private const string TableName = "uploadconfigs";
         public async Task<JObject> GetConfiguration(Guid apiKey)
         {
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("ConfigurationStore"));
