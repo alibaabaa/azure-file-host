@@ -10,6 +10,7 @@ namespace AzureStorageFileHost
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            MvcHandler.DisableMvcResponseHeader = true;
         }
     }
 }
