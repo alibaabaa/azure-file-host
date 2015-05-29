@@ -145,6 +145,7 @@ namespace AzureStorageFileHost
 
         private static string ApplyRenamePattern(string filename, string renamePattern, int? width = null, int? height = null)
         {
+            renamePattern = renamePattern.Replace("{now:yyyy}", DateTime.Now.ToString("yyyy"));
             renamePattern = renamePattern.Replace("{now:MM}", DateTime.Now.ToString("MM"));
             renamePattern = renamePattern.Replace("{now:dd}", DateTime.Now.ToString("dd"));
             renamePattern = renamePattern.Replace("{file:name}", filename.Substring(0, filename.LastIndexOf('.')));
