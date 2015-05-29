@@ -39,7 +39,7 @@
          "fileActions":[
             {
                "name":"original",
-               "rename":"{now:MM}/{now:dd}/{file:name}.{file:ext}",
+               "rename":"{now:yyyy}/{file:name}.{file:ext}",
                "replaceExisting":false
             }
          ]
