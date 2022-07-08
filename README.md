@@ -1,4 +1,4 @@
-# azure-file-host
+# Azure File Host
 
 ## Azure image and file host with JSON configuration
 azure-file-host is an ASP.NET web app that accepts POSTed files and pushes them to an Azure blob store. Multiple configurations are supported via JSON config files, including useful stuff like **image resizing** and **file renaming**.
